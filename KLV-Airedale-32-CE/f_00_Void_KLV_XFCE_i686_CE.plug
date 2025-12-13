@@ -26,7 +26,7 @@ xbps-install -y ntfs-3g zstd zip 7zip unzip p7zip rsync kmod xwininfo
 xbps-install -y base-files libgcc dash coreutils sed tar gawk squashfs-tools xorriso
 xbps-install -y binutils xz device-mapper dhclient dracut-network openresolv 
 xbps-install -y dialog cryptsetup lvm2 mdadm void-docs-browse xtools-minimal xmirror chrony tmux
-xbps-install -y xorg-minimal xorg-input-drivers setxkbmap xauth orca
+xbps-install -y xorg-minimal xorg-input-drivers xorg-video-drivers setxkbmap xauth orca
 xbps-install -y espeakup void-live-audio brltty
 xbps-install -y dhcpcd wpa_supplicant acpid
 xbps-install -y gvfs-afc gvfs-mtp gvfs-smb udisks2
