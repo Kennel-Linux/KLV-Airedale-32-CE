@@ -1,5 +1,4 @@
 # KLV-Airedale-32-CE
 
-
-<img width="840" height="472" alt="Screenshot-20251211T211837" src="https://github.com/user-attachments/assets/1eb53e89-a5f0-477e-9a3a-4af30441f6a0" />
+<img width="800" height="450" alt="Screenshot-20251212T231646" src="https://github.com/user-attachments/assets/33581698-c00d-433d-9333-5e987c5b8644" />
 
