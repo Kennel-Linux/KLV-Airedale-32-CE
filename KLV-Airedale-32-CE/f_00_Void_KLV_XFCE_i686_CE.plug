@@ -15,10 +15,10 @@
 # Simply comment in or comment out till you have what you desire
 # or add new packages to the xbps-install lists.
 # You can add as many valid commandlines as you want in here.
-# eudev setxkbmap xorg-fonts xauth xinit
+
 # base system
 xbps-install -y base-minimal ncurses-base
-xbps-install -y file xrandr mc xauth eudev xinit dbus polkitd
+xbps-install -y file mc xauth eudev xinit dbus polkitd
 xbps-install -y shadow wpa_supplicant dhcpcd file bash
 xbps-install -y ntfs-3g zstd zip 7zip unzip p7zip rsync kmod xwininfo
 xbps-install -y xorg-minimal xorg-input-drivers setxkbmap orca
@@ -60,7 +60,7 @@ xbps-install -y gftp rox geany mtpaint xfce4-screenshooter
 xbps-install -y octoxbps fox guvcview putty smplayer mpv
 xbps-install -y e2fsprogs yelp gparted xhost pfetch
 xbps-install -y dosfstools mtools syslinux cherrytree galculator
-xbps-install -y squashfs-tools wget leafpad xmessage xterm
+xbps-install -y squashfs-tools wget leafpad xmessage xterm xrandr
 xbps-install -y micro htop btop gpick gcolor2 gufw xtools xdg-utils
 
 # Browser selection
@@ -161,6 +161,42 @@ done
 EOF
 
 chmod +x /usr/local/bin/start-up
+
+# Start-up home
+mkdir -p /home/spot/.config/autostart
+touch /home/spot/.config/autostart/start-up.desktop
+cat <<'EOF' >> /home/spot/.config/autostart/start-up.desktop
+[Desktop Entry]
+Encoding=UTF-8
+Version=0.9.4
+Type=Application
+Name=start-up
+Comment=
+Exec=/usr/local/bin/start-up
+OnlyShowIn=XFCE;
+RunHook=0
+StartupNotify=false
+Terminal=false
+Hidden=false
+EOF
+
+# Start-up root
+mkdir -p /root/.config/autostart
+touch /root/.config/autostart/start-up.desktop
+cat <<'EOF' >> /root/.config/autostart/start-up.desktop
+[Desktop Entry]
+Encoding=UTF-8
+Version=0.9.4
+Type=Application
+Name=start-up
+Comment=
+Exec=/usr/local/bin/start-up
+OnlyShowIn=XFCE;
+RunHook=0
+StartupNotify=false
+Terminal=false
+Hidden=false
+EOF
 
 # Start poorercputemp
 mkdir -p /home/spot/.config/autostart
