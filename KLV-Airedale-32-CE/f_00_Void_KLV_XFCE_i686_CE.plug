@@ -18,20 +18,20 @@
 
 # base system
 xbps-install -y base-minimal ncurses-base
-xbps-install -y file mc xauth eudev xinit dbus polkitd
+xbps-install -y mc eudev xinit dbus xrdb
 xbps-install -y shadow wpa_supplicant dhcpcd file bash
 xbps-install -y ntfs-3g zstd zip 7zip unzip p7zip rsync kmod xwininfo
-xbps-install -y xorg-minimal xorg-input-drivers setxkbmap orca
-xbps-install -y espeakup void-live-audio brltty
 
+# system
 xbps-install -y base-files libgcc dash coreutils sed tar gawk squashfs-tools xorriso
 xbps-install -y binutils xz device-mapper dhclient dracut-network openresolv 
 xbps-install -y dialog cryptsetup lvm2 mdadm void-docs-browse xtools-minimal xmirror chrony tmux
-xbps-install -y xorg-minimal xorg-input-drivers setxkbmap xauth orca polkitd
+xbps-install -y xorg-minimal xorg-input-drivers setxkbmap xauth orca
 xbps-install -y espeakup void-live-audio brltty
 xbps-install -y dhcpcd wpa_supplicant acpid
 xbps-install -y gvfs-afc gvfs-mtp gvfs-smb udisks2
 xbps-install -y font-misc-misc terminus-font dejavu-fonts-ttf
+xbps-install -y gnome-themes-standard gnome-keyring
 
 # set up passwd system
 pwconv
@@ -58,7 +58,7 @@ xbps-install -y gvfs yad tzutils dialog gettext cpupower
 xbps-install -y gvfs-smb gvfs-mtp gvfs-cdda gvfs-afc udisks2 xdotool
 xbps-install -y gftp rox geany mtpaint xfce4-screenshooter
 xbps-install -y octoxbps fox guvcview putty smplayer mpv
-xbps-install -y e2fsprogs yelp gparted xhost pfetch
+xbps-install -y e2fsprogs yelp gparted xhost pfetch openssh
 xbps-install -y dosfstools mtools syslinux cherrytree galculator
 xbps-install -y squashfs-tools wget leafpad xmessage xterm xrandr
 xbps-install -y micro htop btop gpick gcolor2 gufw xtools xdg-utils
@@ -214,123 +214,14 @@ EOF
 # ln -s /etc/sv/dbus /var/service
 ln -s /etc/sv/dbus /etc/runit/runsvdir/default/dbus
 ln -s /etc/sv/ntpd /etc/runit/runsvdir/default/ntpd  # /etc/sv/nptd is symlink to chronyd
+ln -s /etc/sv/polkitd /etc/runit/runsvdir/default/polkitd
+ln -s /etc/sv/sshd /etc/runit/runsvdir/default/sshd
+ln -s /etc/sv/udevd /etc/runit/runsvdir/default/udevd
+ln -s /etc/sv/chronyd /etc/runit/runsvdir/default/chronyd
 
 # elogind
 xbps-install -y elogind
 ln -s /etc/sv/elogind /var/service/
-
-# Auto-editing .xinitrc to use xfce4 instead of twm
-# Because I'm using exec here the script will end there so no xterms started
-#
-# sed -i 's/twm &/exec xfce4-session/' ~/.xinitrc
-
-## .xinitrc
-cat <<'EOF' >> /root/.xinitrc
-#!/bin/sh
-
-userresources="$HOME/.Xresources"
-usermodmap="$HOME/.Xmodmap"
-sysresources="$xinitdir/.Xresources"
-sysmodmap="$xinitdir/.Xmodmap"
-
-# merge in defaults and keymaps
-
-if [ -f "$sysresources" ]; then
-    if [ -x /usr/bin/cpp ] ; then
-        "$xrdb" -merge "$sysresources"
-    else
-        "$xrdb" -nocpp -merge "$sysresources"
-    fi
-fi
-
-if [ -f "$sysmodmap" ]; then
-    "$xmodmap" "$sysmodmap"
-fi
-
-if [ -f "$userresources" ]; then
-    if [ -x /usr/bin/cpp ] ; then
-        "$xrdb" -merge "$userresources"
-    else
-        "$xrdb" -nocpp -merge "$userresources"
-    fi
-fi
-
-if [ -f "$usermodmap" ]; then
-    "$xmodmap" "$usermodmap"
-fi
-
-# start some nice programs
-
-if [ -d "$xinitdir"/xinitrc.d ] ; then
-	for f in "$xinitdir/xinitrc.d"/?*.sh ; do
-		[ -x "$f" ] && . "$f"
-	done
-	unset f
-fi
-
-EOF
-
-sed -i '51,$d' /root/.xinitrc
-echo "pipewire &" >>/root/.xinitrc
-echo "pipewire-pulse &" >>/root/.xinitrc
-echo "/usr/local/bin/start-up &" >>/root/.xinitrc 
-echo "xfce4-session" >>/root/.xinitrc
-#echo "# exec xfce4-session" >>/root/.xinitrc  # removed exec to allow dropping out of Xorg to console
-
-# .xinitrc to use in xfce
-#
-touch /home/spot/.xinitrc
-cat <<'EOF' >> /home/spot/.xinitrc
-#!/bin/sh
-
-userresources="$HOME/.Xresources"
-usermodmap="$HOME/.Xmodmap"
-sysresources="$xinitdir/.Xresources"
-sysmodmap="$xinitdir/.Xmodmap"
-
-# merge in defaults and keymaps
-
-if [ -f "$sysresources" ]; then
-    if [ -x /usr/bin/cpp ] ; then
-        "$xrdb" -merge "$sysresources"
-    else
-        "$xrdb" -nocpp -merge "$sysresources"
-    fi
-fi
-
-if [ -f "$sysmodmap" ]; then
-    "$xmodmap" "$sysmodmap"
-fi
-
-if [ -f "$userresources" ]; then
-    if [ -x /usr/bin/cpp ] ; then
-        "$xrdb" -merge "$userresources"
-    else
-        "$xrdb" -nocpp -merge "$userresources"
-    fi
-fi
-
-if [ -f "$usermodmap" ]; then
-    "$xmodmap" "$usermodmap"
-fi
-
-# start some nice programs
-
-if [ -d "$xinitdir"/xinitrc.d ] ; then
-	for f in "$xinitdir/xinitrc.d"/?*.sh ; do
-		[ -x "$f" ] && . "$f"
-	done
-	unset f
-fi
-
-EOF
-
-sed -i '51,$d' /home/spot/.xinitrc
-echo "pipewire &" >>/home/spot/.xinitrc
-echo "pipewire-pulse &" >>/home/spot/.xinitrc
-echo "/usr/local/bin/start-up &" >>/home/spot/.xinitrc
-echo "xfce4-session" >>/home/spot/.xinitrc
-#echo "# exec xfce4-session" >>/home/spot/.xinitrc  # removed exec to allow dropping out of Xorg to console
 
 # ~/.Xresources for larger xterm uxterm fonts
 cat <<'XRESOURCES' > ~/.Xresources
@@ -419,7 +310,7 @@ mkdir -p /home/spot/Desktop
 mkdir -p /home/spot/Documents
 mkdir -p /home/spot/Downloads
 mkdir -p /home/spot/Music
-mkdir -p /home/spot/my-applications
+# mkdir -p /home/spot/my-applications
 mkdir -p /home/spot/Pictures
 mkdir -p /home/spot/Public
 mkdir -p /home/spot/Startup
@@ -432,7 +323,7 @@ mkdir -p /root/Desktop
 mkdir -p /root/Documents
 mkdir -p /root/Downloads
 mkdir -p /root/Music
-mkdir -p /root/my-applications
+# mkdir -p /root/my-applications
 mkdir -p /root/Pictures
 mkdir -p /root/Public
 mkdir -p /root/Startup
@@ -454,11 +345,6 @@ xhost +
 chmod 755 /
 chmod 755 /bin
 chmod 755 /lib
-
-# add sudo -spot to .desktop files
-# cd /usr/share/applications
-# sed -i 's/^Exec=/&sudo -uspot /' octoxbps.desktop
-# sed -i 's/^Exec=/&sudo -uspot /' octoxbps-notifier.desktop
 
 # Copy .desktop files to /root/.local/share/applications and add run-as-spot to the Exec command
 #
@@ -548,3 +434,79 @@ rm /var/cache/xbps/*
 # Set your timezone. Example:
 current_timezone="Etc/UTC"
 ln -sf /usr/share/zoneinfo/${current_timezone} /etc/localtime
+-/' thunar-spot.desktop
+
+#### Get KLV custom packages ####
+#
+# Create and switch to build directory
+mkdir -p /root/Build
+cd /root/Build
+
+wget -c https://github.com/sofijacom/xbps_packages/raw/refs/heads/main/gparted-shell-1.0_0.noarch.xbps
+wget -c https://github.com/sofijacom/xbps_packages/raw/refs/heads/main/xbps-tools-1.0_3.noarch.xbps
+wget -c https://gitlab.com/sofija.p2018/kla-ot2/-/raw/main/KLV-Airedale-32/programs/uextract-4.14_0.i686.xbps
+wget -c https://github.com/sofijacom/xbps_packages/raw/refs/heads/main/SFS-Load-2.0_1.noarch.xbps
+wget -c https://github.com/sofijacom/xbps_packages/raw/refs/heads/main/tas-2.0_1.noarch.xbps
+wget -c https://github.com/sofijacom/xbps_packages/raw/refs/heads/main/packit-pfind-3.0_1.noarch.xbps
+wget -c https://github.com/sofijacom/xbps_packages/raw/refs/heads/main/run-as-users-1.5_1.noarch.xbps
+wget -c https://github.com/sofijacom/xbps_packages/raw/refs/heads/main/inst-xbps-1.8_1.noarch.xbps
+wget -c https://gitlab.com/sofija.p2018/kla-ot2/-/raw/main/KLV-Airedale-32/programs/save2flash-1.9_0.i686.xbps
+wget -c https://gitlab.com/sofija.p2018/kla-ot2/-/raw/main/KLV-Airedale-32/programs/poorercputemp-0.1_1.i686.xbps
+wget -c https://gitlab.com/sofija.p2018/kla-ot2/-/raw/main/KLV-Airedale-32/programs/dcontrol-2.0_1.i686.xbps
+wget -c https://github.com/sofijacom/xbps_packages/raw/refs/heads/main/Octoxbps-cleaner-cache-1.1.2_1.noarch.xbps
+
+#### Install KLV custom packages ####
+
+# Register and index packages
+cd /root
+xbps-rindex -a Build/*.xbps
+
+# Install gparted-shell
+xbps-install -y --repository=Build/ gparted-shell-1.0_0
+
+# Install xbps-tools 
+xbps-install -y --repository=Build/ xbps-tools-1.0_3
+
+# Install uextract
+xbps-install -y --repository=Build/ uextract-4.14_0
+
+# Install SFS-Load
+xbps-install -y --repository=Build/ SFS-Load-2.0_1
+
+# Install tas
+xbps-install -y --repository=Build/ tas-2.0_1
+
+# Install Packit and pFind
+xbps-install -y --repository=Build/ packit-pfind-3.0_1
+
+# Install run-as-spot and run-as-weedog
+xbps-install -y --repository=Build/ run-as-users-1.5_1
+
+# Install inst-xbps
+xbps-install -y --repository=Build/ inst-xbps-1.8_1
+
+# Install save2flash
+xbps-install -y --repository=Build/ save2flash-1.9_0
+
+# Install poorercputemp
+xbps-install -y --repository=Build/ poorercputemp-0.1_1
+
+# Install dcontrol
+xbps-install -y --repository=Build/ dcontrol-2.0_1
+
+# Install Octoxbps-cleaner-cache
+xbps-install -y --repository=Build/ Octoxbps-cleaner-cache-1.1.2_1
+
+# Set execution permissions recursivly for binaries and scripts
+chmod +x -R /usr/local/bin
+
+# Clean Up
+#
+
+rm -r /root/Build
+rm /var/cache/xbps/*
+
+# Set your timezone. Example:
+current_timezone="Etc/UTC"
+ln -sf /usr/share/zoneinfo/${current_timezone} /etc/localtime
+
