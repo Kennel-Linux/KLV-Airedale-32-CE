@@ -18,7 +18,7 @@
 
 # base system
 xbps-install -y base-minimal ncurses-base
-xbps-install -y mc eudev xinit dbus xrdb
+xbps-install -y mc eudev xinit dbus xrdb xmodmap
 xbps-install -y shadow wpa_supplicant dhcpcd file bash
 xbps-install -y ntfs-3g zstd zip 7zip unzip p7zip rsync kmod xwininfo
 
