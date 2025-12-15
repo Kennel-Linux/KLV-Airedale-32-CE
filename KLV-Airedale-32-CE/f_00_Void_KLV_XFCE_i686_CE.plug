@@ -27,7 +27,7 @@ xbps-install -y base-files libgcc dash coreutils sed tar gawk squashfs-tools xor
 xbps-install -y binutils xz device-mapper dhclient dracut-network openresolv 
 xbps-install -y dialog cryptsetup lvm2 mdadm void-docs-browse xtools-minimal xmirror chrony tmux
 xbps-install -y xorg-minimal xorg-input-drivers xorg-video-drivers setxkbmap xauth orca
-xbps-install -y espeakup void-live-audio brltty
+xbps-install -y espeakup void-live-audio brltty xdg-desktop-portal-gnome
 xbps-install -y dhcpcd wpa_supplicant acpid
 xbps-install -y gvfs-afc gvfs-mtp gvfs-smb udisks2
 xbps-install -y font-misc-misc terminus-font dejavu-fonts-ttf
@@ -353,7 +353,7 @@ cp /usr/share/applications/octoxbps.desktop  /root/.local/share/applications/oct
 cp /usr/share/applications/octoxbps-notifier.desktop  /root/.local/share/applications/octoxbps-notifier.desktop
 
 cd /root/.local/share/applications/
-sed -i 's/^Exec=/&run-as-spot /' octoxbps.desktop
+sed -i 's/^Exec=/&sudo -u spot /' octoxbps.desktop
 sed -i 's/^Exec=/&run-as-spot /' octoxbps-notifier.desktop
 cp /root/.local/share/applications/octoxbps-notifier.desktop /etc/xdg/autostart/octoxbps-notifier.desktop
 
@@ -379,6 +379,7 @@ wget -c https://gitlab.com/sofija.p2018/kla-ot2/-/raw/main/KLV-Airedale-32/progr
 wget -c https://gitlab.com/sofija.p2018/kla-ot2/-/raw/main/KLV-Airedale-32/programs/poorercputemp-0.1_1.i686.xbps
 wget -c https://gitlab.com/sofija.p2018/kla-ot2/-/raw/main/KLV-Airedale-32/programs/dcontrol-2.0_1.i686.xbps
 wget -c https://github.com/sofijacom/xbps_packages/raw/refs/heads/main/Octoxbps-cleaner-cache-1.1.2_1.noarch.xbps
+wget -c https://github.com/sofijacom/xbps_packages/raw/refs/heads/main/swapper-1.2_2.noarch.xbps
 
 #### Install KLV custom packages ####
 
@@ -422,6 +423,9 @@ xbps-install -y --repository=Build/ dcontrol-2.0_1
 # Install Octoxbps-cleaner-cache
 xbps-install -y --repository=Build/ Octoxbps-cleaner-cache-1.1.2_1
 
+# Install swapper
+xbps-install -y --repository=Build/ swapper-1.2_2
+
 # Set execution permissions recursivly for binaries and scripts
 chmod +x -R /usr/local/bin
 
@@ -434,3 +438,5 @@ rm /var/cache/xbps/*
 # Set your timezone. Example:
 current_timezone="Etc/UTC"
 ln -sf /usr/share/zoneinfo/${current_timezone} /etc/localtime
+
+clear
